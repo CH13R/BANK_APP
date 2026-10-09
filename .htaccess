@@ -1,0 +1,5 @@
+# Block direct browser access to the .env file (Apache / XAMPP)
+<Files ".env">
+  Require all denied
+</Files>
+Options -Indexes
