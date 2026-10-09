@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>History | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title">Transaction History</h1>
+  <p class="sub">The latest 100 transactions, with the staff member who handled each one</p>
+  <div class="card tw"><table>
+    <thead><tr><th>Date</th><th>Account No.</th><th>Customer</th><th>Type</th><th>Amount</th><th>Staff</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+</div>
+<script src="js/app.js"></script>
+<script>
+App.init({title: 'History'}).then(async () => {
+  const d = await App.api('transactions.php');
+  document.getElementById('rows').innerHTML = d.transactions.map(r =>
+    `<tr><td>${App.esc(r.created_at)}</td><td>${App.esc(r.account_number)}</td><td>${App.esc(r.customer)}</td>
+     <td><span class="badge ${App.esc(r.type)}">${App.esc(r.type)}</span></td><td><b>${App.money(r.amount)}</b></td><td>${App.esc(r.staff_name)}</td></tr>`).join('');
+  App.animate();
+}).catch(App.onError);
+</script></body></html>

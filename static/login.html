@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Staff Login | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div class="lg">
+  <div class="lg-l">
+    <div class="brand"><img src="logo.svg" alt="CRE BANK">CRE BANK</div>
+    <h1>Secure banking operations for your branch.</h1>
+    <p>Register customers, process deposits and withdrawals, and keep a complete record of every transaction in one place.</p>
+  </div>
+  <div class="lg-r"><div class="lg-f">
+    <h2>Staff Sign In</h2><p>Enter your credentials to access the portal.</p>
+    <div id="msg"></div>
+    <form id="f">
+      <label>Username</label><input type="text" name="username" required>
+      <label>Password</label><input type="password" name="password" required>
+      <button type="submit">Sign In</button>
+    </form>
+  </div></div>
+</div>
+<script src="js/app.js"></script>
+<script>
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target, msg = document.getElementById('msg');
+  try {
+    await App.api('login.php', {username: f.username.value, password: f.password.value});
+    location.href = 'dashboard.html';
+  } catch (err) { App.alertBox(msg, 'err', App.esc(err.message)); }
+});
+</script></body></html>

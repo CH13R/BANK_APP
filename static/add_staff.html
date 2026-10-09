@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Manage Staff | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title">Manage Staff</h1>
+  <p class="sub">Create logins for your bank staff</p>
+  <div id="msg"></div>
+  <div class="card form">
+    <form id="f" autocomplete="off">
+      <input type="text" name="full_name" placeholder="Full name" required>
+      <input type="text" name="username" placeholder="Username" autocomplete="off" required>
+      <input type="password" name="password" placeholder="Password" autocomplete="new-password" required>
+      <select name="role"><option value="teller">Teller</option><option value="manager">Manager</option><option value="admin">Admin</option></select>
+      <button type="submit">Add Staff</button>
+    </form>
+  </div>
+  <div class="card tw"><table>
+    <thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Created</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+</div>
+<script src="js/app.js"></script>
+<script>
+async function load() {
+  const d = await App.api('staff.php');
+  document.getElementById('rows').innerHTML = d.staff.map(s =>
+    `<tr><td>${App.esc(s.full_name)}</td><td>${App.esc(s.username)}</td>
+     <td><span class="badge ${App.esc(s.role)}">${App.esc(s.role)}</span></td><td>${App.esc(s.created_at)}</td></tr>`).join('');
+  App.animate();
+}
+App.init({title: 'Manage Staff', access: 'admin'}).then(() => {
+  document.getElementById('f').addEventListener('submit', async e => {
+    e.preventDefault();
+    const f = e.target, msg = document.getElementById('msg');
+    try {
+      await App.api('staff.php', Object.fromEntries(new FormData(f)));
+      App.alertBox(msg, 'ok', 'Staff added successfully');
+      f.reset();
+      await load();
+    } catch (err) { App.alertBox(msg, 'err', App.esc(err.message)); }
+  });
+  return load();
+}).catch(App.onError);
+</script></body></html>

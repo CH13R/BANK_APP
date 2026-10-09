@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Database Backup | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title">Database Backup</h1>
+  <p class="sub">Download a full copy of the bank data to protect against data loss.</p>
+  <div class="card form">
+    <h3>Create backup</h3>
+    <p style="color:var(--muted);margin-bottom:18px">Saves all staff, customers, accounts and transactions into one .sql file. Keep copies on a flash drive or another computer.</p>
+    <form action="../api/backup.php" method="GET"><button type="submit">Download backup now</button></form>
+  </div>
+  <div class="card">
+    <h3>How to restore</h3>
+    <p style="color:var(--muted);line-height:1.7">Open the Supabase <b>SQL Editor</b>, make sure the tables exist, paste the contents of the backup .sql file and click <b>Run</b>. Warning: this replaces all current data.</p>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>App.init({title: 'Database Backup', access: 'admin'}).catch(App.onError);</script></body></html>

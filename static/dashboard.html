@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title" id="welcome">Welcome</h1>
+  <p class="sub">Here is an overview of branch activity.</p>
+  <div class="grid">
+    <div class="stat">Total customers<b id="s-cust" data-count="0">0</b></div>
+    <div class="stat">Total balance held<b id="s-bal" data-count="0" data-dec="1">0</b></div>
+    <div class="stat">Transactions today<b id="s-today" data-count="0">0</b></div>
+    <div class="stat">Staff members<b id="s-staff" data-count="0">0</b></div>
+  </div>
+  <div class="grid" id="tiles"></div>
+  <div class="card tw">
+    <h3>Recent transactions</h3>
+    <table>
+      <thead><tr><th>Date</th><th>Account No.</th><th>Customer</th><th>Type</th><th>Amount</th><th>Staff</th></tr></thead>
+      <tbody id="recent"></tbody>
+    </table>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>
+App.init({title: 'Dashboard'}).then(async user => {
+  document.getElementById('welcome').textContent = 'Welcome, ' + user.full_name;
+  const tiles = [
+    ['register_customer.html', 'userplus', 'New Customer', 'Open a new account'],
+    ['customers.html', 'users', 'Customers', 'View and search records'],
+    ['transaction.html', 'swap', 'Deposit / Withdraw', 'Update a balance']
+  ];
+  if (user.role !== 'teller') tiles.push(['reports.html', 'chart', 'Reports', 'Staff activity and totals']);
+  if (user.role === 'admin') tiles.push(['add_staff.html', 'shield', 'Manage Staff', 'Add tellers and managers'], ['backup.html', 'db', 'Backup', 'Download the database']);
+  document.getElementById('tiles').innerHTML = tiles.map(t =>
+    `<a class="tile" href="${t[0]}"><span class="ic">${App.ic(t[1])}</span><div><h4>${t[2]}</h4><p>${t[3]}</p></div></a>`).join('');
+
+  const d = await App.api('dashboard.php');
+  document.getElementById('s-cust').dataset.count = d.customers;
+  document.getElementById('s-bal').dataset.count = d.balance;
+  document.getElementById('s-today').dataset.count = d.today;
+  document.getElementById('s-staff').dataset.count = d.staff;
+  document.getElementById('recent').innerHTML = d.recent.map(r =>
+    `<tr><td>${App.esc(r.created_at)}</td><td>${App.esc(r.account_number)}</td><td>${App.esc(r.customer)}</td>
+     <td><span class="badge ${App.esc(r.type)}">${App.esc(r.type)}</span></td><td><b>${App.money(r.amount)}</b></td><td>${App.esc(r.staff_name)}</td></tr>`).join('');
+  App.animate();
+}).catch(App.onError);
+</script></body></html>

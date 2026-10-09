@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reports | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title">Reports</h1>
+  <p class="sub">Branch performance and staff activity for the selected period.</p>
+  <div class="card">
+    <form id="f" class="search">
+      <input type="date" id="from">
+      <input type="date" id="to">
+      <button type="submit">Apply</button>
+    </form>
+  </div>
+  <div class="grid">
+    <div class="stat">Transactions<b id="s-n" data-count="0">0</b></div>
+    <div class="stat">Total deposits<b id="s-dep" data-count="0" data-dec="1">0</b></div>
+    <div class="stat">Total withdrawals<b id="s-wd" data-count="0" data-dec="1">0</b></div>
+    <div class="stat">Net inflow<b id="s-net" data-count="0" data-dec="1">0</b></div>
+  </div>
+  <div class="card tw">
+    <h3>Activity by staff member</h3>
+    <table>
+      <thead><tr><th>Staff</th><th>Role</th><th>Transactions</th><th>Deposits</th><th>Withdrawals</th></tr></thead>
+      <tbody id="staff-rows"></tbody>
+    </table>
+  </div>
+  <div class="card tw">
+    <h3>Daily summary</h3>
+    <table>
+      <thead><tr><th>Date</th><th>Transactions</th><th>Deposits</th><th>Withdrawals</th></tr></thead>
+      <tbody id="daily-rows"></tbody>
+    </table>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+async function load() {
+  const d = await App.api('reports.php?from=' + encodeURIComponent($('from').value) + '&to=' + encodeURIComponent($('to').value));
+  $('from').value = d.from; $('to').value = d.to;
+  $('s-n').dataset.count = d.totals.n;
+  $('s-dep').dataset.count = d.totals.dep;
+  $('s-wd').dataset.count = d.totals.wd;
+  $('s-net').dataset.count = Math.max(0, d.totals.dep - d.totals.wd);
+  $('staff-rows').innerHTML = d.by_staff.map(r =>
+    `<tr><td><b>${App.esc(r.full_name)}</b></td><td><span class="badge ${App.esc(r.role)}">${App.esc(r.role)}</span></td>
+     <td>${r.n}</td><td>${App.money(r.dep)}</td><td>${App.money(r.wd)}</td></tr>`).join('');
+  $('daily-rows').innerHTML = d.daily.length ? d.daily.map(r =>
+    `<tr><td>${App.esc(r.d)}</td><td>${r.n}</td><td>${App.money(r.dep)}</td><td>${App.money(r.wd)}</td></tr>`).join('')
+    : '<tr><td colspan="4">No transactions in this period.</td></tr>';
+  App.animate();
+}
+App.init({title: 'Reports', access: 'manager'}).then(() => {
+  $('f').addEventListener('submit', e => { e.preventDefault(); load().catch(App.onError); });
+  return load();
+}).catch(App.onError);
+</script></body></html>

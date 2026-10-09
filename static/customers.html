@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Customers | CRE BANK</title><link rel="icon" type="image/svg+xml" href="logo.svg"><link rel="stylesheet" href="css/style.css"></head><body>
+<div id="page">
+  <h1 class="title">Customers</h1>
+  <p class="sub">Search by name, phone or account number</p>
+  <div class="card">
+    <form id="f" class="search">
+      <input type="text" id="q" placeholder="Search...">
+      <button type="submit">Search</button>
+    </form>
+    <div class="tw"><table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Account No.</th><th>Type</th><th>Balance</th><th>Registered by</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+</div>
+<script src="js/app.js"></script>
+<script>
+async function load() {
+  const d = await App.api('customers.php?q=' + encodeURIComponent(document.getElementById('q').value.trim()));
+  document.getElementById('rows').innerHTML = d.customers.map(r =>
+    `<tr><td><b>${App.esc(r.full_name)}</b></td><td>${App.esc(r.phone)}</td><td>${App.esc(r.account_number)}</td>
+     <td><span class="badge ${App.esc(r.account_type)}">${App.esc(r.account_type)}</span></td><td><b>${App.money(r.balance)}</b></td>
+     <td>${App.esc(r.staff_name)}</td></tr>`).join('');
+  App.animate();
+}
+App.init({title: 'Customers'}).then(() => {
+  document.getElementById('f').addEventListener('submit', e => { e.preventDefault(); load().catch(App.onError); });
+  return load();
+}).catch(App.onError);
+</script></body></html>
